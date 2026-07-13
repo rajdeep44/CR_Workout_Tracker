@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Untitled</title>
+    
+
+  </head>
+    
+  <body>
+  <html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Rajdeep's Personal Transformation Engine</title>
+  
+  <!-- PWA Web App Manifest Link -->
+  <link rel="manifest" href="manifest.json">
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-main: #0B0F19;
+      --bg-card: #161C2A;
+      --neon-blue: #00F2FE;
+      --neon-green: #4FACFE;
+      --text-main: #F3F4F6;
+      --text-muted: #9CA3AF;
+      --border-color: #242F41;
+      --success: #10B981;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      margin: 0;
+      padding: 0;
+      padding-bottom: 85px;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    header {
+      background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
+      padding: 20px 15px;
+      text-align: center;
+      font-weight: 800;
+      letter-spacing: 1px;
+      font-size: 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      color: #FFF;
+      text-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+    }
+
+    .container {
+      padding: 15px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .view-panel {
+      display: none;
+    }
+
+    .view-panel.active {
+      display: block;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+
+    h3 {
+      margin-top: 0;
+      font-size: 1.2rem;
+      color: #FFF;
+      border-left: 4px solid var(--neon-blue);
+      padding-left: 8px;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(17, 24, 39, 0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      z-index: 1000;
+    }
+
+    .nav-item {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.2s;
+    }
+
+    .nav-item.active {
+      color: var(--neon-blue);
+      text-shadow: 0 0 8px rgba(0, 242, 254, 0.4);
+    }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+    /* UI Controls */
+    select,
+    input[type="number"],
+    input[type="text"] {
+      background: #1F2937;
+      border: 1px solid var(--border-color);
+      color: #FFF;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 1rem;
+      width: 100%;
+      box-sizing: border-box;
+      outline: none;
+    }
+
+    select:focus,
+    input:focus {
+      border-color: var(--neon-blue);
+    }
+
+    .flex-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    /* Exercises Grid */
+    .set-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1F2937;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+
+    .set-box input {
+      width: 70px;
+      text-align: center;
+      padding: 6px;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .btn-action {
+      background: linear-gradient(135deg, var(--neon-green) 0%, var(--neon-blue) 100%);
+      color: #000;
+      font-weight: 700;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      width: 100%;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: 0 4px 14px rgba(0, 242, 254, 0.2);
+    }
+
+    /* Target Anatomy Component */
+    .anatomy-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    .anatomy-tag {
+      background: #1F2937;
+      border: 1px solid var(--border-color);
+      padding: 10px;
+      border-radius: 6px;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .anatomy-tag.highlighted {
+      background: rgba(0, 242, 254, 0.15);
+      border-color: var(--neon-blue);
+      color: var(--neon-blue);
+    }
+
+    /* Habit Checkboxes */
+    .habit-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .habit-row:last-child {
+      border-bottom: none;
+    }
+
+    .checkbox-custom {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--border-color);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .checkbox-custom.checked {
+      background-color: var(--success);
+      border-color: var(--success);
+    }
+
+    .checkbox-custom.checked::after {
+      content: "✓";
+      color: white;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    .metric-badge {
+      background: rgba(79, 172, 254, 0.1);
+      color: var(--neon-green);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .history-card {
+      border-bottom: 1px solid var(--border-color);
+      padding: 10px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>⚡ TRANSFORMATION CORE</header>
+
+  <div class="container">
+
+    <!-- DASHBOARD PANEL -->
+    <div id="panel-dash" class="view-panel active">
+      <div class="card">
+        <h3>Current Metrics</h3>
+        <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+          <div>
+            <span style="color: var(--text-muted); font-size: 0.85rem;">Target Weight</span>
+            <div style="font-size: 1.5rem; font-weight: 700;">82.0 kg</div>
+          </div>
+          <div style="text-align: right;">
+            <span style="color: var(--text-muted); font-size: 0.85rem;">Goal Focus</span>
+            <div style="font-size: 1.1rem; font-weight: 700; color: var(--neon-blue);">Lean Muscle / Tone</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Quick Log Metrics</h3>
+        <div style="margin-top: 10px;">
+          <label style="font-size: 0.85rem; color: var(--text-muted);">Log Current Weight (kg)</label>
+          <div class="flex-row" style="margin-top:5px;">
+            <input type="number" id="dash-weight-input" step="0.1" placeholder="e.g. 81.5">
+            <button class="btn-action" style="margin-top:0; width:auto; padding: 0 20px;" onclick="logWeight()">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Daily Routine Anchor Status</h3>
+        <div id="dash-compliance-summary" style="font-size: 0.95rem; line-height: 1.5;">
+          Log logs today to refresh status.
+        </div>
+      </div>
+    </div>
+
+    <!-- WORKOUT PANEL -->
+    <div id="panel-workout" class="view-panel">
+      <div class="card">
+        <h3>Workout Routine Engine</h3>
+        <div class="flex-row" style="margin-top: 15px;">
+          <select id="workout-week-select" onchange="renderWorkoutEngine()">
+            <option value="1">Week 1: Foundation Building</option>
+            <option value="2">Week 2: Stability & Balance</option>
+            <option value="3">Week 3: Volume & Tension</option>
+            <option value="4">Week 4: Tempo & Control</option>
+          </select>
+          <select id="workout-day-select">
+            <option value="Day 1">Day 1 (Mon)</option>
+            <option value="Day 2">Day 2 (Wed)</option>
+            <option value="Day 3">Day 3 (Fri)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Anatomy Target Visual Guide -->
+      <div class="card">
+        <h3>Target Anatomy System Map</h3>
+        <div class="anatomy-container" id="anatomy-map">
+          <div class="anatomy-tag" id="target-quads">🍗 Lower Body (Legs)</div>
+          <div class="anatomy-tag" id="target-back">🦅 Posterior Chain (Back)</div>
+          <div class="anatomy-tag" id="target-chest">🛡️ Upper Push (Chest)</div>
+          <div class="anatomy-tag" id="target-shoulders">🪵 Deltoids (Shoulders)</div>
+        </div>
+      </div>
+
+      <div id="engine-exercises-container"></div>
+    </div>
+
+    <!-- DIET PANEL -->
+    <div id="panel-diet" class="view-panel">
+      <div class="card">
+        <h3>Diet Protocol Compliance</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top:-5px;">Check boxes upon successful intake to verify standard macro compliance.</p>
+
+        <div class="habit-row">
+          <div class="checkbox-custom" id="diet-hab-1" onclick="toggleHabit('diet-hab-1')"></div>
+          <div>
+            <strong>Waking Intake</strong>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">1 glass warm water with Chia/Flax seeds</div>
+          </div>
+        </div>
+
+        <div class="habit-row">
+          <div class="checkbox-custom" id="diet-hab-2" onclick="toggleHabit('diet-hab-2')"></div>
+          <div>
+            <strong>Breakfast Target</strong>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">2 Whole Boiled Eggs eaten FIRST before mains</div>
+          </div>
+        </div>
+
+        <div class="habit-row">
+          <div class="checkbox-custom" id="diet-hab-3" onclick="toggleHabit('diet-hab-3')"></div>
+          <div>
+            <strong>Lunch Shield</strong>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Isabgol water 15 mins BEFORE lunch</div>
+          </div>
+        </div>
+
+        <div class="habit-row">
+          <div class="checkbox-custom" id="diet-hab-4" onclick="toggleHabit('diet-hab-4')"></div>
+          <div>
+            <strong>Dinner Restriction</strong>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Chapatis or Half-Plate rice strategy followed</div>
+          </div>
+        </div>
+
+        <button class="btn-action" onclick="saveDietDay()">Log Today's Compliance</button>
+      </div>
+    </div>
+
+    <!-- ANALYTICS PANEL -->
+    <div id="panel-analytics" class="view-panel">
+      <div class="card">
+        <h3>Weight Tracking Data Trend</h3>
+        <canvas id="weightChart" width="400" height="220"></canvas>
+      </div>
+      <div class="card">
+        <h3>Completed Workouts History Log</h3>
+        <div id="analytics-history-log" style="max-height: 250px; overflow-y: auto;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM BAR NAVIGATION -->
+  <div class="nav-bar">
+    <button class="nav-item active" onclick="switchView('dash')">
+      <svg viewBox="0 0 24 24">
+        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+      </svg>
+      Home
+    </button>
+    <button class="nav-item" onclick="switchView('workout')">
+      <svg viewBox="0 0 24 24">
+        <path d="M20.57 14.86L22 13.43l-3.43-3.43 1.43-1.43 4.29 4.29-4.29 4.29zM3.43 14.86l-1.43-1.43 3.43-3.43-1.43-1.43L1.71 12.9l4.29 4.29zm8.57-7.43l4.29 4.29-4.29 4.29-4.29-4.29z" />
+      </svg>
+      Engine
+    </button>
+    <button class="nav-item" onclick="switchView('diet')">
+      <svg viewBox="0 0 24 24">
+        <path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm7-3c-1.78 0-3 1.22-3 3v7h6V9c0-1.78-1.22-3-3-3z" />
+      </svg>
+      Diet
+    </button>
+    <button class="nav-item" onclick="switchView('analytics')">
+      <svg viewBox="0 0 24 24">
+        <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" />
+      </svg>
+      Analytics
+    </button>
+  </div>
+
+  <script>
+    const exerciseDatabase = {
+      1: [{
+          name: "Goblet Squats",
+          target: "quads",
+          guide: "7.5 kg DB | 3 Sets x 12 Reps"
+        },
+        {
+          name: "Resistance Band Rows",
+          target: "back",
+          guide: "Band under feet | 3 Sets x 15 Reps"
+        },
+        {
+          name: "DB Floor Press",
+          target: "chest",
+          guide: "5kg or 7.5kg DBs | 3 Sets x 12 Reps"
+        },
+        {
+          name: "DB Romanian Deadlifts",
+          target: "quads",
+          guide: "2x 7.5 kg DBs | 3 Sets x 10 Reps"
+        },
+        {
+          name: "Standing DB Overhead Press",
+          target: "shoulders",
+          guide: "2x 5 kg DBs | 3 Sets x 10 Reps"
+        },
+        {
+          name: "Plank Hold",
+          target: "shoulders",
+          guide: "Mat (Track seconds) | 3 Sets x 30-45s"
+        }
+      ],
+      2: [{
+          name: "Reverse Lunges",
+          target: "quads",
+          guide: "Bodyweight or 5kg | 3 Sets x 10 Reps"
+        },
+        {
+          name: "Single-Arm DB Row",
+          target: "back",
+          guide: "1x 7.5 kg DB | 3 Sets x 12 Reps"
+        },
+        {
+          name: "Banded Push-Ups",
+          target: "chest",
+          guide: "Band or Bodyweight | 3 Sets x Max"
+        },
+        {
+          name: "Glute Bridges",
+          target: "quads",
+          guide: "7.5 kg DB on hips | 3 Sets x 15 Reps"
+        },
+        {
+          name: "Lateral Deltoid Raises",
+          target: "shoulders",
+          guide: "2x 5 kg DBs | 3 Sets x 12 Reps"
+        },
+        {
+          name: "Bird-Dog",
+          target: "back",
+          guide: "Mat stability | 3 Sets x 10 Reps"
+        }
+      ],
+      3: [{
+          name: "Sumo Squats",
+          target: "quads",
+          guide: "1x 7.5 kg DB | 3 Sets x 15 Reps"
+        },
+        {
+          name: "DB Pull-Overs",
+          target: "back",
+          guide: "1x 7.5 kg DB | 3 Sets x 12 Reps"
+        },
+        {
+          name: "Floor DB Flyes",
+          target: "chest",
+          guide: "2x 5 kg DBs | 3 Sets x 12 Reps"
+        },
+        {
+          name: "Banded Good Mornings",
+          target: "back",
+          guide: "Band looped | 3 Sets x 15 Reps"
+        },
+        {
+          name: "DB Arnold Press",
+          target: "shoulders",
+          guide: "2x 5 kg DBs | 3 Sets x 10 Reps"
+        },
+        {
+          name: "Deadbug",
+          target: "back",
+          guide: "Mat core stability | 3 Sets x 12 Reps"
+        }
+      ],
+      4: [{
+          name: "Tempo Goblet Squats",
+          target: "quads",
+          guide: "7.5 kg (3s down) | 3 Sets x 10 Reps"
+        },
+        {
+          name: "DB Rows",
+          target: "back",
+          guide: "2x 7.5 kg DBs | 3 Sets x 12 Reps"
+        },
+        {
+          name: "Diamond Floor Press",
+          target: "chest",
+          guide: "2x 5 kg DBs together | 3 Sets x 12 Reps"
+        },
+        {
+          name: "Single-Leg Glute Bridge",
+          target: "quads",
+          guide: "Bodyweight on Mat | 3 Sets x 10 Reps"
+        },
+        {
+          name: "Half-Kneeling Shoulder Press",
+          target: "shoulders",
+          guide: "1x 7.5 kg DB | 3 Sets x 8 Reps"
+        },
+        {
+          name: "Forearm Plank with Rocking",
+          target: "shoulders",
+          guide: "Core stability | 3 Sets x 40s"
+        }
+      ]
+    };
+
+    function switchView(viewId) {
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      document.getElementById(`panel-${viewId}`).classList.add('active');
+      event.currentTarget.classList.add('active');
+      if (viewId === 'workout') {
+        renderWorkoutEngine();
+      }
+      if (viewId === 'analytics') {
+        updateAnalytics();
+      }
+      if (viewId === 'dash') {
+        updateDashboardSummary();
+      }
+    }
+
+    function toggleHabit(id) {
+      document.getElementById(id).classList.toggle('checked');
+    }
+
+    function renderWorkoutEngine() {
+      const week = document.getElementById('workout-week-select').value;
+      const container = document.getElementById('engine-exercises-container');
+      container.innerHTML = '';
+      // Clear existing anatomy highlights
+      document.querySelectorAll('.anatomy-tag').forEach(t => t.classList.remove('highlighted'));
+      exerciseDatabase[week].forEach((exe, index) => {
+        // Highlight the respective target anatomy maps dynamically
+        const tag = document.getElementById(`target-${exe.target}`);
+        if (tag) tag.classList.add('highlighted');
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <div style="font-weight:700; font-size:1.1rem; color:#FFF;">${exe.name}</div>
+                        <div style="font-size:0.85rem; color:var(--text-muted); margin-top:3px;">📋 Target Setup: ${exe.guide}</div>
+                    </div>
+                    <span class="metric-badge">${exe.target.toUpperCase()}</span>
+                </div>
+                <div style="margin-top:12px;">
+                    <div class="set-box"><label style="font-size:0.85rem;">Set 1 Reps</label><input type="number" id="eng-w${week}-e${index}-s1" placeholder="0"></div>
+                    <div class="set-box"><label style="font-size:0.85rem;">Set 2 Reps</label><input type="number" id="eng-w${week}-e${index}-s2" placeholder="0"></div>
+                    <div class="set-box"><label style="font-size:0.85rem;">Set 3 Reps</label><input type="number" id="eng-w${week}-e${index}-s3" placeholder="0"></div>
+                </div>
+                <button class="btn-action" style="padding:10px; font-size:0.9rem; margin-top:12px;" onclick="saveEngineExercise(${week}, ${index}, '${exe.name}')">Commit Exercise Set</button>
+            `;
+        container.appendChild(card);
+      });
+    }
+
+    function saveEngineExercise(week, index, name) {
+      const day = document.getElementById('workout-day-select').value;
+      const s1 = parseInt(document.getElementById(`eng-w${week}-e${index}-s1`).value) || 0;
+      const s2 = parseInt(document.getElementById(`eng-w${week}-e${index}-s2`).value) || 0;
+      const s3 = parseInt(document.getElementById(`eng-w${week}-e${index}-s3`).value) || 0;
+      if (!s1 && !s2 && !s3) {
+        alert("Please input rep numbers to log!");
+        return;
+      }
+      let history = JSON.parse(localStorage.getItem('rajdeep_workout_history')) || [];
+      history.push({
+        date: new Date().toLocaleDateString('en-IN'),
+        label: `Week ${week} - ${day}`,
+        name: name,
+        score: `${s1} / ${s2} / ${s3}`,
+        timestamp: Date.now()
+      });
+      localStorage.setItem('rajdeep_workout_history', JSON.stringify(history));
+      alert(`${name} log captured successfully!`);
+    }
+
+    function saveDietDay() {
+      let score = 0;
+      if (document.getElementById('diet-hab-1').classList.contains('checked')) score++;
+      if (document.getElementById('diet-hab-2').classList.contains('checked')) score++;
+      if (document.getElementById('diet-hab-3').classList.contains('checked')) score++;
+      if (document.getElementById('diet-hab-4').classList.contains('checked')) score++;
+      localStorage.setItem('rajdeep_diet_last_score', score);
+      alert(`Logged! You hit ${score}/4 daily nutritional objectives today.`);
+    }
+
+    function logWeight() {
+      const w = parseFloat(document.getElementById('dash-weight-input').value);
+      if (!w) return;
+      let timeline = JSON.parse(localStorage.getItem('rajdeep_weight_timeline')) || [];
+      timeline.push({
+        date: new Date().toLocaleDateString('en-IN'),
+        weight: w,
+        time: Date.now()
+      });
+      localStorage.setItem('rajdeep_weight_timeline', JSON.stringify(timeline));
+      document.getElementById('dash-weight-input').value = '';
+      alert("Weight timestamped successfully!");
+      updateDashboardSummary();
+    }
+
+    function updateDashboardSummary() {
+      const score = localStorage.getItem('rajdeep_diet_last_score') || "0";
+      document.getElementById('dash-compliance-summary').innerHTML = `
+            🎯 Last Recorded Nutritional Compliance: <strong>${score} / 4 tasks met</strong>.<br>
+            🚀 Keep your 2 whole morning eggs and Isabgol routines running to amplify fat burning!
+        `;
+    }
+    let weightChartInstance = null;
+
+    function updateAnalytics() {
+      const historyContainer = document.getElementById('analytics-history-log');
+      const logs = JSON.parse(localStorage.getItem('rajdeep_workout_history')) || [];
+      if (!logs.length) {
+        historyContainer.innerHTML = "<div style='color:var(--text-muted); font-size:0.9rem;'>No reps recorded yet.</div>";
+      } else {
+        logs.sort((a, b) => b.timestamp - a.timestamp);
+        historyContainer.innerHTML = logs.map(l => `
+                <div class="history-card">
+                    <div><strong>${l.name}</strong><br><span style="font-size:0.8rem; color:var(--text-muted);">${l.label}</span></div>
+                    <div style="text-align:right; font-weight:bold; color:var(--neon-blue);">${l.score} <span style="font-size:0.75rem; color:#fff;">reps</span></div>
+                </div>
+            `).join('');
+      }
+      // Chart mapping
+      const wTimeline = JSON.parse(localStorage.getItem('rajdeep_weight_timeline')) || [{
+        date: "Initial",
+        weight: 82.0
+      }];
+      const labels = wTimeline.map(t => t.date);
+      const weights = wTimeline.map(t => t.weight);
+      const ctx = document.getElementById('weightChart').getContext('2d');
+      if (weightChartInstance) weightChartInstance.destroy();
+      weightChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Bodyweight Curve (kg)',
+            data: weights,
+            borderColor: '#00F2FE',
+            backgroundColor: 'rgba(0, 242, 254, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: '#9CA3AF'
+              }
+            },
+            y: {
+              grid: {
+                color: '#242F41'
+              },
+              ticks: {
+                color: '#9CA3AF'
+              }
+            }
+          }
+        }
+      });
+    }
+    // Initialize layout
+    updateDashboardSummary();
+  </script>
+
+  <!-- Service Worker Registration Logic for Native App Support -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('PWA Service Worker successfully active:', reg.scope))
+          .catch(err => console.error('Service Worker connection failed:', err));
+      });
+    }
+  </script>
+</body>
+
+</html>
+    
+  </body>
+  
+</html>
